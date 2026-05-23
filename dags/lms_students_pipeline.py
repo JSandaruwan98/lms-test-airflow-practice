@@ -1,14 +1,17 @@
 import sys
 import os
+from datetime import datetime
 from airflow import DAG
 from airflow.operators.python import PythonOperator
-from datetime import datetime
 
-# --- ADD THESE 2 LINES ---
-# This allows Airflow to find the 'etl' and 'config' folders
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+# --- THIS IS THE FIX ---
+# This adds the project root directory to the Python path
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+# -----------------------
 
-# Now your imports will work
+# Now you can import your modules
 from etl.extract.extract_students import extract_student_data
 from etl.transform.transform_students import transform_student_data
 from etl.load.load_students import load_student_data
