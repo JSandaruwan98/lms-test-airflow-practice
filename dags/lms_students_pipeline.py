@@ -1,16 +1,21 @@
+import sys
+import os
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime
+
+# --- ADD THESE 2 LINES ---
+# This allows Airflow to find the 'etl' and 'config' folders
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+
+# Now your imports will work
 from etl.extract.extract_students import extract_student_data
 from etl.transform.transform_students import transform_student_data
 from etl.load.load_students import load_student_data
 
 def run_etl_process():
-    # Step 1: Extract
     raw_data = extract_student_data()
-    # Step 2: Transform
     clean_data = transform_student_data(raw_data)
-    # Step 3: Load
     load_student_data(clean_data)
 
 with DAG(
