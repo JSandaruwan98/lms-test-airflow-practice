@@ -37,7 +37,7 @@ with DAG(
     dag_id='lms_students_etl_v2',
     default_args=default_args,
     description='ETL pipeline for LMS student data',
-    schedule_interval='@daily',
+    schedule='@daily',
     start_date=datetime(2023, 1, 1),
     catchup=False,
     tags=['lms', 'students'],
