@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 
-def transform_student_data(ti):
+def transform_students(ti):
     """
     ti: The Airflow Task Instance object (used to pull data from XCom)
     """
