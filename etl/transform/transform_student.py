@@ -1,37 +1,27 @@
 import pandas as pd
 import os
 
-def transform_students(ti):
+def transform_student_data(input_path): # Changed argument from 'ti' to 'input_path'
     """
-    ti: The Airflow Task Instance object (used to pull data from XCom)
+    input_path: The string path passed from the DAG
     """
-    # 1. Get the file path from the 'extract_task'
-    # 'extract_task' must match the task_id defined in your DAG
-    input_path = ti.xcom_pull(task_ids='extract_task')
-    
     if not input_path or not os.path.exists(input_path):
         raise FileNotFoundError(f"Could not find input file: {input_path}")
 
-    # 2. Load the data (using read_parquet or read_csv based on your extract task)
+    # 1. Load the data
     if input_path.endswith('.parquet'):
         df = pd.read_parquet(input_path)
     else:
         df = pd.read_csv(input_path)
 
-    # 3. Apply Transformations
-    # Fill empty email fields
+    # 2. Apply Transformations
     if 'email' in df.columns:
         df['email'] = df['email'].fillna('unknown@example.com')
     
-    # Add a 'processed_at' timestamp
-    # Note: pd.Timestamp.now() is the modern way to get 'now' in Pandas
     df['processed_at'] = pd.Timestamp.now()
 
-    # 4. Save the transformed data to a new file
+    # 3. Save the transformed data
     output_path = "/tmp/transformed_students_data.parquet"
     df.to_parquet(output_path, index=False)
     
-    print(f"Transformation complete. File saved to {output_path}")
-
-    # 5. Return the path so the LOAD task can find it
     return output_path
