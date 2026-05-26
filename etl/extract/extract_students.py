@@ -16,4 +16,7 @@ def extract_student_data():
     
     query = "SELECT * FROM students" # Assuming students table exists
     df = pd.read_sql(query, engine)
-    return df
+    output_path = "/tmp/students_data.csv"
+    df.to_csv(output_path, index=False)
+    
+    return output_path
