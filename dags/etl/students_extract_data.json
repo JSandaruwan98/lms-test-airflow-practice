@@ -1,0 +1,23 @@
+[
+    {
+        "id":1,
+        "name":"Kasun Silva",
+        "email":"kasun@gmail.com",
+        "city":"Matara",
+        "created_at":1767225600000
+    },
+    {
+        "id":2,
+        "name":"Nimal Perera",
+        "email":"nimal@gmail.com",
+        "city":"Colombo",
+        "created_at":1767571200000
+    },
+    {
+        "id":3,
+        "name":"Amal Silva",
+        "email":"amal@gmail.com",
+        "city":"Kandy",
+        "created_at":1779494400000
+    }
+]

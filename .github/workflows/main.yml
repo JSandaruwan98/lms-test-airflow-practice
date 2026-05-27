@@ -38,3 +38,6 @@ jobs:
             # pip install -r requirements.txt
             
             echo "Deployment to Azure VM 2 successful!"
+
+            cp ~/lms-test-airflow-practice/dags/* /home/airflow/airflow/dags/
+            echo "DAGs copied to Airflow directory!"

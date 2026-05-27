@@ -57,6 +57,5 @@ with DAG(
         task_id='load_students',
         python_callable=load_task_callable
     )
-
     # Define dependencies
     t1 >> t2 >> t3
