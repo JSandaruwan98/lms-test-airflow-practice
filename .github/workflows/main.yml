@@ -39,5 +39,5 @@ jobs:
             
             echo "Deployment to Azure VM 2 successful!"
 
-            cp ~/lms-test-airflow-practice/dags/* /airflow/airflow/dags/
+            cp -r lms-test-airflow-practice/dags/* ~/airflow/dags/
             echo "DAGs copied to Airflow directory!"
