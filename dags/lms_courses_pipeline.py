@@ -14,11 +14,11 @@ def extract_task_callable():
     from etl.extract.extract_course import extract_course_data
     return extract_course_data()
 
-# def transform_task_callable(ti):
-#     from etl.transform.transform_courses import transform_course_data
-#     # 'ti' is the Task Instance, used to pull data from the previous task (XCom)
-#     raw_data = ti.xcom_pull(task_ids='extract_courses')
-#     return transform_course_data(raw_data)
+def transform_task_callable(ti):
+    from etl.transform.transform_courses import transform_course_data
+    # 'ti' is the Task Instance, used to pull data from the previous task (XCom)
+    raw_data = ti.xcom_pull(task_ids='extract_courses')
+    return transform_course_data(raw_data)
 
 # def load_task_callable(ti):
 #     from etl.load.load_students import load_student_data
@@ -48,14 +48,14 @@ with DAG(
         python_callable=extract_task_callable
     )
 
-    # t2 = PythonOperator(
-    #     task_id='transform_courses',
-    #     python_callable=transform_task_callable
-    # )
+    t2 = PythonOperator(
+        task_id='transform_courses',
+        python_callable=transform_task_callable
+    )
 
     # t3 = PythonOperator(
     #     task_id='load_courses',
     #     python_callable=load_task_callable
     # )
     # Define dependencies
-    t1 # >> t2 >> t3
+    t1 >> t2 # >> t3
