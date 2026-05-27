@@ -5,19 +5,19 @@ from etl.config.db_config import check_lms_db_connection, check_lms_warehouse_co
 import csv
 import os
 
-def extract_latest_student_data(engine, warehouse_engine):
-    # 1. Get the last entered student_id from the Warehouse
+def extract_latest_course_data(engine, warehouse_engine):
+    # 1. Get the last entered course_id from the Warehouse
     try:
         with warehouse_engine.connect() as conn:
-            # We look for the max student_id already in the Warehouse
-            result = conn.execute(text("SELECT MAX(student_id) FROM dim_student"))
+            # We look for the max course_id already in the Warehouse
+            result = conn.execute(text("SELECT MAX(course_id) FROM dim_course"))
             last_id = result.scalar()
             
             # If the table is empty, last_id will be None. Set it to 0.
             if last_id is None:
                 last_id = 0
                 
-        print(f"Last student_id found in Warehouse: {last_id}")
+        print(f"Last course_id found in Warehouse: {last_id}")
         
     except Exception as e:
         print(f"Could not check last ID (maybe table doesn't exist yet): {e}")
@@ -25,7 +25,7 @@ def extract_latest_student_data(engine, warehouse_engine):
 
     # 2. Fetch only data GREATER than the last_id from the source
     # We use a f-string or parameter to inject the last_id
-    query = f"SELECT * FROM students WHERE id > {last_id}"
+    query = f"SELECT * FROM courses WHERE id > {last_id}"
     
     print(f"Fetching new records from source where id > {last_id}...")
     df = pd.read_sql(query, engine)
@@ -37,17 +37,17 @@ def extract_latest_student_data(engine, warehouse_engine):
 
     return df
 
-def extract_student_data():
+def extract_course_data():
     engine = check_lms_db_connection()
     warehouse_engine = check_lms_warehouse_connection()
     
-    df =extract_latest_student_data(engine, warehouse_engine)
+    df =extract_latest_course_data(engine, warehouse_engine)
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
 
     root_dir = os.path.dirname(current_dir) 
     
-    json_path = os.path.join(root_dir, "students_extract_data.json")
+    json_path = os.path.join(root_dir, "courses_extract_data.json")
     print(f"Saving JSON to: {json_path}")
     df.to_json(json_path, orient='records', indent=4)
 
