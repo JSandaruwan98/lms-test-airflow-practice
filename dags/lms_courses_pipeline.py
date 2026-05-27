@@ -11,8 +11,8 @@ if project_root not in sys.path:
 
 # Standard ETL functions using Task dependencies
 def extract_task_callable():
-    from etl.extract.extract_students import extract_student_data
-    return extract_student_data()
+    from etl.extract.extract_course import extract_course_data
+    return extract_course_data()
 
 # def transform_task_callable(ti):
 #     from etl.transform.transform_courses import transform_course_data
