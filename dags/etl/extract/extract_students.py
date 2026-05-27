@@ -1,39 +1,11 @@
 import pandas as pd
 from sqlalchemy import create_engine, text
 from urllib.parse import quote_plus
-from etl.config.db_config import LMS_DB_CONFIG, WAREHOUSE_CONFIG
+from etl.config.db_config import check_lms_db_connection, check_lms_warehouse_connection
 import csv
 import os
 
-def check_lms_db_connection():
-    try:
-        user = LMS_DB_CONFIG['user']
-        password = quote_plus(LMS_DB_CONFIG['password']) 
-        host = LMS_DB_CONFIG['host']
-        port = LMS_DB_CONFIG['port']
-        db = LMS_DB_CONFIG['database']
 
-        conn_str = f"postgresql://{user}:{password}@{host}:{port}/{db}"
-        engine = create_engine(conn_str)
-        
-        return engine
-    except Exception as e:
-        print(f"Database connection failed: {e}")
-        
-def check_lms_warehouse_connection():
-    try:
-        user = WAREHOUSE_CONFIG['user']
-        password = quote_plus(WAREHOUSE_CONFIG['password']) 
-        host = WAREHOUSE_CONFIG['host']
-        port = WAREHOUSE_CONFIG['port']
-        db = WAREHOUSE_CONFIG['database']
-
-        conn_str = f"postgresql://{user}:{password}@{host}:{port}/{db}"
-        engine = create_engine(conn_str)
-        
-        return engine
-    except Exception as e:
-        print(f"Database connection failed: {e}")
         
 def extract_latest_student_data(engine, warehouse_engine):
     # 1. Get the last entered student_id from the Warehouse
