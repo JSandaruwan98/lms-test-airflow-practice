@@ -10,21 +10,10 @@ if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
 # Standard ETL functions using Task dependencies
-def extract_task_callable():
-    from etl.extract.extract_course import extract_course_data
-    return extract_course_data()
-
-# def transform_task_callable(ti):
-#     from etl.transform.transform_courses import transform_course_data
-#     # 'ti' is the Task Instance, used to pull data from the previous task (XCom)
-#     raw_data = ti.xcom_pull(task_ids='extract_courses')
-#     return transform_course_data(raw_data)
-
-# def load_task_callable(ti):
-#     from etl.load.load_courses import load_course_data
-#     clean_data = ti.xcom_pull(task_ids='transform_courses')
-#     load_course_data(clean_data)
-
+def load_date_task():
+    from etl.load.load_date import load_dim_date
+    load_dim_date()
+    
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
@@ -42,21 +31,11 @@ with DAG(
     catchup=False,
     tags=['lms', 'date_static'],
 ) as dag:
-
+    
     t1 = PythonOperator(
-        task_id='extract_courses',
-        python_callable=extract_task_callable
+        task_id='populate_dim_date',
+        python_callable=load_date_task
     )
-
-    # t2 = PythonOperator(
-    #     task_id='transform_courses',
-    #     python_callable=transform_task_callable
-    # )
-
-    # t3 = PythonOperator(
-    #     task_id='load_courses',
-    #     python_callable=load_task_callable
-    # )
     
     # Define dependencies
-    t1 #>> t2 >> t3
+    t1 
