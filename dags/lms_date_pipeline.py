@@ -23,10 +23,10 @@ default_args = {
 }
 
 with DAG(
-    dag_id='lms_date_etl_v2',
+    dag_id='lms_date_pipeline_v2',
     default_args=default_args,
     description='ETL pipeline for LMS date data',
-    schedule='@daily',
+    schedule='@once',
     start_date=datetime(2023, 1, 1),
     catchup=False,
     tags=['lms', 'date_static'],
