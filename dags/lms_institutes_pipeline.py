@@ -20,10 +20,10 @@ def transform_task_callable(ti):
     raw_data = ti.xcom_pull(task_ids='extract_institutes')
     return transform_institute_data(raw_data)
 
-# def load_task_callable(ti):
-#     from etl.load.load_institutes import load_institute_data
-#     clean_data = ti.xcom_pull(task_ids='transform_institutes')
-#     load_institute_data(clean_data)
+def load_task_callable(ti):
+    from etl.load.load_institutes import load_institute_data
+    clean_data = ti.xcom_pull(task_ids='transform_institutes')
+    load_institute_data(clean_data)
 
 default_args = {
     'owner': 'airflow',
@@ -53,9 +53,9 @@ with DAG(
         python_callable=transform_task_callable
     )
 
-    # t3 = PythonOperator(
-    #     task_id='load_institutes',
-    #     python_callable=load_task_callable
-    # )
+    t3 = PythonOperator(
+        task_id='load_institutes',
+        python_callable=load_task_callable
+    )
     # Define dependencies
-    t1 >> t2 # >> t3
+    t1 >> t2 >> t3
