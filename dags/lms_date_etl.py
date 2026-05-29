@@ -4,14 +4,26 @@ from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 
-# Adjust path to find your ETL scripts
+# Project root fix (keep this if your modules aren't in /dags or /plugins)
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
+# Standard ETL functions using Task dependencies
 def extract_task_callable():
     from etl.extract.extract_course import extract_course_data
     return extract_course_data()
+
+# def transform_task_callable(ti):
+#     from etl.transform.transform_courses import transform_course_data
+#     # 'ti' is the Task Instance, used to pull data from the previous task (XCom)
+#     raw_data = ti.xcom_pull(task_ids='extract_courses')
+#     return transform_course_data(raw_data)
+
+# def load_task_callable(ti):
+#     from etl.load.load_courses import load_course_data
+#     clean_data = ti.xcom_pull(task_ids='transform_courses')
+#     load_course_data(clean_data)
 
 default_args = {
     'owner': 'airflow',
@@ -22,18 +34,29 @@ default_args = {
 }
 
 with DAG(
-    dag_id='lms_date_v2',
+    dag_id='lms_date_etl_v2',
     default_args=default_args,
-    description='Populates the static Date Dimension',
-    schedule='@daily',  # You only need to run this once
+    description='ETL pipeline for LMS date data',
+    schedule='@daily',
     start_date=datetime(2023, 1, 1),
     catchup=False,
     tags=['lms', 'date'],
 ) as dag:
-    
+
     t1 = PythonOperator(
         task_id='extract_courses',
         python_callable=extract_task_callable
     )
 
-    t1
+    # t2 = PythonOperator(
+    #     task_id='transform_courses',
+    #     python_callable=transform_task_callable
+    # )
+
+    # t3 = PythonOperator(
+    #     task_id='load_courses',
+    #     python_callable=load_task_callable
+    # )
+    
+    # Define dependencies
+    t1 #>> t2 >> t3
