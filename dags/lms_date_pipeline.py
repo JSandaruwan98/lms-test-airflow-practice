@@ -40,7 +40,7 @@ with DAG(
     schedule='@daily',
     start_date=datetime(2023, 1, 1),
     catchup=False,
-    tags=['lms', 'date'],
+    tags=['lms', 'date_static'],
 ) as dag:
 
     t1 = PythonOperator(
