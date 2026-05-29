@@ -5,7 +5,9 @@ import sys
 import os
 
 # Adjust path to find your ETL scripts
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
 
 def load_date_task():
     from etl.load.load_date import load_dim_date
