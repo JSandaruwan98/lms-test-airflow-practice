@@ -3,6 +3,7 @@ import os
 from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.python import PythonOperator
+from dags.etl.transform.transform_institutes import transform_institute_data
 
 # Project root fix (keep this if your modules aren't in /dags or /plugins)
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -14,16 +15,16 @@ def extract_task_callable():
     from etl.extract.extract_institutes import extract_institute_data
     return extract_institute_data()
 
-# def transform_task_callable(ti):
-#     from etl.transform.transform_students import transform_student_data
-#     # 'ti' is the Task Instance, used to pull data from the previous task (XCom)
-#     raw_data = ti.xcom_pull(task_ids='extract_students')
-#     return transform_student_data(raw_data)
+def transform_task_callable(ti):
+    from etl.transform.transform_institutes import transform_institute_data
+    # 'ti' is the Task Instance, used to pull data from the previous task (XCom)
+    raw_data = ti.xcom_pull(task_ids='extract_institutes')
+    return transform_institute_data(raw_data)
 
 # def load_task_callable(ti):
-#     from etl.load.load_students import load_student_data
-#     clean_data = ti.xcom_pull(task_ids='transform_students')
-#     load_student_data(clean_data)
+#     from etl.load.load_institutes import load_institute_data
+#     clean_data = ti.xcom_pull(task_ids='transform_institutes')
+#     load_institute_data(clean_data)
 
 default_args = {
     'owner': 'airflow',
@@ -48,14 +49,14 @@ with DAG(
         python_callable=extract_task_callable
     )
 
-    # t2 = PythonOperator(
-    #     task_id='transform_institutes',
-    #     python_callable=transform_task_callable
-    # )
+    t2 = PythonOperator(
+        task_id='transform_institutes',
+        python_callable=transform_task_callable
+    )
 
     # t3 = PythonOperator(
     #     task_id='load_institutes',
     #     python_callable=load_task_callable
     # )
     # Define dependencies
-    t1 # >> t2 >> t3
+    t1 >> t2 # >> t3
