@@ -26,7 +26,7 @@ with DAG(
     schedule_interval='@once',  # You only need to run this once
     start_date=datetime(2023, 1, 1),
     catchup=False,
-    tags=['lms', 'static_data'],
+    tags=['lms', 'dates'],
 ) as dag:
 
     t1 = PythonOperator(
