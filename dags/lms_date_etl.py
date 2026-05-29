@@ -28,12 +28,12 @@ with DAG(
     schedule='@once',  # You only need to run this once
     start_date=datetime(2023, 1, 1),
     catchup=False,
-    tags=['lms', 'dates'],
+    tags=['lms', 'date'],
 ) as dag:
 
-    t1 = PythonOperator(
-        task_id='populate_dim_date',
-        python_callable=load_date_task
-    )
+    # t1 = PythonOperator(
+    #     task_id='populate_dim_date',
+    #     python_callable=load_date_task
+    # )
 
-    t1
+    # t1
