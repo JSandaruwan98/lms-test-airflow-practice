@@ -25,7 +25,7 @@ with DAG(
     dag_id='lms_dim_date_loader',
     default_args=default_args,
     description='Populates the static Date Dimension',
-    schedule_interval='@once',  # You only need to run this once
+    schedule='@once',  # You only need to run this once
     start_date=datetime(2023, 1, 1),
     catchup=False,
     tags=['lms', 'dates'],
