@@ -32,9 +32,21 @@ def extract_latest_payments_data(engine, warehouse_engine):
 
     return df
 
-def extract_dimensions_to_json():
+def extract_all_lms_data():
+    # 1. Setup Connections
+    engine = check_lms_db_connection()
     warehouse_engine = check_lms_warehouse_connection()
-        
+    
+    # 2. Setup Paths
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    root_dir = os.path.dirname(current_dir) 
+    
+    # Dictionary to keep track of file paths
+    extracted_paths = {}
+
+    print("--- Starting Full Extraction Process ---")
+
+    # --- Part 1: Extract Dimensions ---
     tables_to_extract = [
         ("dim_student", "dim_student.json"),
         ("dim_course", "dim_course.json"),
@@ -42,44 +54,39 @@ def extract_dimensions_to_json():
         ("dim_date", "dim_date.json")
     ]
     
-    print("--- Starting Dimension Extraction ---")
-    
     for table_name, file_name in tables_to_extract:
         try:
-            # Technical Step: Read from SQL
             query = f"SELECT * FROM {table_name}"
-            df = pd.read_sql(query, warehouse_engine)
-            
-            current_dir = os.path.dirname(os.path.abspath(__file__))
-            
-            root_dir = os.path.dirname(current_dir) 
+            df_dim = pd.read_sql(query, warehouse_engine)
             
             json_path = os.path.join(root_dir, file_name)
-            df.to_json(json_path, orient='records', indent=4, date_format='iso')
+            df_dim.to_json(json_path, orient='records', indent=4, date_format='iso')
             
+            # Store the path in our dictionary
+            extracted_paths[table_name] = json_path
             print(f"Successfully saved {table_name} to {json_path}")
-
         except Exception as e:
             print(f"Error extracting {table_name}: {e}")
+            extracted_paths[table_name] = None
 
-    print("--- All Dimensions Extracted ---")
-    return root_dir
+    # --- Part 2: Extract Payment Data ---
+    try:
+        df_payments = extract_latest_payments_data(engine, warehouse_engine)
+        payment_json_path = os.path.join(root_dir, "payments_extract_data.json")
+        
+        df_payments.to_json(payment_json_path, orient='records', indent=4)
+        extracted_paths['payments'] = payment_json_path
+        print(f"Successfully saved payment data to: {payment_json_path}")
+    except Exception as e:
+        print(f"Error extracting payment data: {e}")
+        extracted_paths['payments'] = None
 
+    print("--- All Extractions Complete ---")
 
-def extract_payment_data():
-    engine = check_lms_db_connection()
-    warehouse_engine = check_lms_warehouse_connection()
-    
-    df = extract_latest_payments_data(engine, warehouse_engine)
-
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-
-    root_dir = os.path.dirname(current_dir) 
-    
-    json_path = os.path.join(root_dir, "payments_extract_data.json")
-    print(f"Saving JSON to: {json_path}")
-    df.to_json(json_path, orient='records', indent=4)
-
-    print("Success! Check your folder now.")
-
-    return json_path
+    # Return the specific paths requested
+    return (
+        extracted_paths.get('payments'),
+        extracted_paths.get('dim_student'),
+        extracted_paths.get('dim_course'),
+        extracted_paths.get('dim_institute')
+    )
