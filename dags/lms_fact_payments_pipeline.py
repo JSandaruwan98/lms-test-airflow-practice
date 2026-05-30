@@ -9,8 +9,9 @@ if project_root not in sys.path:
     sys.path.insert(0, project_root)
     
 def extract_task_callable():
-    from etl.extract.extract_payments import extract_payment_data
-    return extract_payment_data()
+    from etl.extract.extract_payments import extract_payment_data, extract_dimensions_to_json
+    extract_payment_data()
+    extract_dimensions_to_json()
     
 default_args = {
     'owner': 'airflow',
