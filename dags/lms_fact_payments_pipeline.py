@@ -11,7 +11,7 @@ if project_root not in sys.path:
 def extract_task_callable():
     from etl.extract.extract_payments import extract_all_lms_data
     raw_data = extract_all_lms_data()
-    print(f"Extracted data saved at: {raw_data}")
+    print(f"Extracted data saved at: {raw_data[0]}")
     return extract_all_lms_data()
     
 # def transform_task_callable(ti):
