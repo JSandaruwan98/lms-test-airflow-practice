@@ -10,14 +10,12 @@ if project_root not in sys.path:
     
 def extract_task_callable():
     from etl.extract.extract_payments import extract_all_lms_data
-    raw_data = extract_all_lms_data()
-    print(f"Extracted data saved at: {raw_data[0]}")
     return extract_all_lms_data()
     
-# def transform_task_callable(ti):
-#     from etl.transform.transform_payment import transform_payment_fact
-#     raw_data = ti.xcom_pull(task_ids='extract_payments')
-#     return transform_payment_fact(raw_data)
+def transform_task_callable(ti):
+    from etl.transform.transform_payment import transform_payment_fact
+    raw_data = ti.xcom_pull(task_ids='extract_payments')
+    return transform_payment_fact(raw_data)
     
 default_args = {
     'owner': 'airflow',
@@ -42,4 +40,9 @@ with DAG(
         python_callable=extract_task_callable
     )
     
-    t1
+    t2 = PythonOperator(
+        task_id='transform_payments',   
+        python_callable=transform_task_callable
+    )
+    
+    t1 >> t2

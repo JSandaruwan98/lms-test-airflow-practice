@@ -1,21 +1,21 @@
 import pandas as pd
 import os
 
-def transform_payment_fact(payment_json_path, dim_student_path, dim_course_path, dim_institute_path):
+def transform_payment_fact(raw_data):
     print("--- Starting Payment Fact Transformation ---")
 
     # 1. LOAD RAW DATA
     # This is your extracted JSON with student_id, course_id, etc.
-    if not os.path.exists(payment_json_path):
-        raise FileNotFoundError(f"Input file not found: {payment_json_path}")
+    if not os.path.exists(raw_data[0]):
+        raise FileNotFoundError(f"Input file not found: {raw_data[0]}")
     
-    df_raw = pd.read_json(payment_json_path)
+    df_raw = pd.read_json(raw_data[0])
 
     # 2. LOAD DIMENSIONS (The Lookup Tables)
     # We load these to get the Surrogate Keys (the 'key' columns)
-    dim_student = pd.read_json(dim_student_path)
-    dim_course = pd.read_json(dim_course_path)
-    dim_institute = pd.read_json(dim_institute_path)
+    dim_student = pd.read_json(raw_data[1])
+    dim_course = pd.read_json(raw_data[2])
+    dim_institute = pd.read_json(raw_data[3])
 
     # 3. TECHNICAL STEP: TRANSFORM DATE
     # Your date is in Milliseconds (1777593600000). We need to make it an Integer (YYYYMMDD)
